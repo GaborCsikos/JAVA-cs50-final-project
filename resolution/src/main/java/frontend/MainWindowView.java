@@ -17,7 +17,7 @@ import javax.swing.JMenuItem;
  * @author Gabor Csikos
  * 
  */
-public class MainWindow extends JFrame implements ActionListener {
+public class MainWindowView extends JFrame implements ActionListener {
 
 	private JMenuBar menuBar;
 	private JMenu yearMenu;

@@ -1,6 +1,5 @@
 package backend;
 
-import frontend.MainWindow;
 
 /**
  * Main class of application
@@ -14,8 +13,8 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		MainWindow mainWindow = new MainWindow();
-		mainWindow.start();
+		MainWindowController controller = new MainWindowController();
+		controller.start();
 	}
 
 }
