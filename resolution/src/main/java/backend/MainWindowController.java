@@ -1,6 +1,5 @@
 package backend;
 
-import frontend.MainWindowView;
 
 /**
  * Controller for year handling
@@ -9,17 +8,14 @@ import frontend.MainWindowView;
  * 
  */
 public class MainWindowController {
-	private MainWindowView view;
 	private MainWindowModel model;
 
 	public MainWindowController() {
-		view = new MainWindowView();
 		model = new MainWindowModel();
 	}
 
 	public void start() {
 		model.start();
-		view.start();
 
 	}
 }

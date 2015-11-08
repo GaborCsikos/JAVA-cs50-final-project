@@ -1,5 +1,7 @@
 package backend;
 
+import frontend.MainWindowView;
+
 /**
  * Main class of application
  * 
@@ -13,7 +15,15 @@ public class Main {
 	 */
 	public static void main(String[] args) {
 		MainWindowController controller = new MainWindowController();
-		controller.start();
+		MainWindowView view = new MainWindowView(controller);
+		try {
+			view.start();
+			controller.start();
+		} catch (Exception e) {
+			e.printStackTrace();
+			view.showMessage("Problem occured, please contact the developer!");
+		}
+
 	}
 
 }
