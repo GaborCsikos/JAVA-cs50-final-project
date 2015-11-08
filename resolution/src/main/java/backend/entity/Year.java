@@ -24,6 +24,14 @@ public class Year implements Serializable {
 
 	private List<Resolution> resolutions = new ArrayList<>();
 
+	public Year() {
+
+	}
+
+	public Year(int year) {
+		this.year = year;
+	}
+
 	public List<Resolution> getResolutions() {
 		return resolutions;
 	}

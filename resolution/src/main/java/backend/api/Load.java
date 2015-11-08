@@ -3,6 +3,8 @@
  */
 package backend.api;
 
+import java.io.File;
+
 import backend.entity.Year;
 
 /**
@@ -13,5 +15,5 @@ import backend.entity.Year;
  */
 public interface Load {
 
-	Year load(int year);
+	Year load(File file);
 }

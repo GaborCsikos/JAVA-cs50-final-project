@@ -3,6 +3,7 @@ package backend;
 import frontend.MainWindowView;
 
 /**
+ * Controller for year handling
  * 
  * @author Gabor Csikos
  * 

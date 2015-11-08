@@ -1,6 +1,5 @@
 package backend;
 
-
 /**
  * Main class of application
  * 

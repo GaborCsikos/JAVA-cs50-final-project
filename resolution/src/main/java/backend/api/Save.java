@@ -13,6 +13,6 @@ import backend.entity.Year;
  */
 public interface Save {
 
-	FileType save(String filePath, String fileName, Year year);
+	FileReturnType save(String filePath, String fileName, Year year);
 
 }

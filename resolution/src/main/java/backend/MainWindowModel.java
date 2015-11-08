@@ -6,6 +6,8 @@ package backend;
 import backend.entity.Year;
 
 /**
+ * Model for Year Handling
+ * 
  * @author Gabor Csikos
  * 
  */
