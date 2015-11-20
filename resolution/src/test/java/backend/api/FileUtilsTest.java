@@ -5,6 +5,7 @@ package backend.api;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -50,10 +51,18 @@ public class FileUtilsTest {
 	@Test
 	public void testFullPath() throws EmptyFullPathException {
 		String path = "/home/test";
-		String filename = "Test";
+		String filename = "Test.year";
 		String actual = FileUtils.getFullPath(path, filename);
-		String expected = path + "/" + filename + "." + FileUtils.FILE_TYPE;
+		String expected = path + "/" + filename;
 		assertEquals("Full path is Different", expected, actual);
+	}
+
+	@Test
+	public void testIsFileTypeGood() {
+		String filename = "test.year";
+		Assert.assertTrue(FileUtils.isFileTypeGood(filename));
+		String filenameBad = "testyear";
+		Assert.assertFalse(FileUtils.isFileTypeGood(filenameBad));
 	}
 
 }

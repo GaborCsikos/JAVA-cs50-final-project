@@ -5,14 +5,18 @@ package frontend;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 
 import backend.MainWindowController;
+import backend.api.FileUtils;
 
 /**
  * Main window of application
@@ -29,6 +33,8 @@ public class MainWindowView extends JFrame implements ActionListener {
 	private JMenuItem saveYear;
 	private JMenuItem exitWithoutSave;
 	private MainWindowController controller;
+	private static final String TEST_PATH = "/home/csikirustu/test"; // TODO
+																		// delete
 	/**
 	 * 
 	 */
@@ -43,12 +49,34 @@ public class MainWindowView extends JFrame implements ActionListener {
 		if (e.getSource() == exitWithoutSave) {
 			System.exit(0);
 		} else if (e.getSource() == saveYear) {
-			// TODO save year
+			if (controller.isYearSet()) {
+				JFileChooser chooser = new JFileChooser();
+				chooser.setCurrentDirectory(new java.io.File("."));
+				chooser.setDialogTitle("Save Year to:");
+				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+				FileFilter filter = new YearFilter();
+				chooser.setFileFilter(filter);
+				chooser.setCurrentDirectory(new File(TEST_PATH));
+				if (chooser.showSaveDialog(null) == JFileChooser.SAVE_DIALOG) {
+					if (chooser.getSelectedFile() != null) {
+						String path = chooser.getSelectedFile()
+								.getAbsolutePath();
+						if (FileUtils.isFileTypeGood(path)) {
+							controller.saveYear(chooser.getSelectedFile()
+									.getAbsolutePath(), path);
+						} else {
+							controller.saveYear(chooser.getSelectedFile()
+									.getAbsolutePath(), controller.getName());
+						}
+					}
+				}
+			}
+
 		} else if (e.getSource() == loadYear) {
 			// TODO loadYear
 		} else if (e.getSource() == newYear) {
 			String result = JOptionPane.showInputDialog(this, "Enter a year:");
-			// controller.checkNumber();
+			controller.checkNumber(result);
 		}
 	}
 
@@ -89,6 +117,9 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 	private void initListeners() {
 		exitWithoutSave.addActionListener(this);
+		newYear.addActionListener(this);
+		saveYear.addActionListener(this);
+		loadYear.addActionListener(this);
 	}
 
 }

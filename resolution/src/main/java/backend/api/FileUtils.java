@@ -13,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public final class FileUtils {
 	public static final String FILE_TYPE = "year";
+	public static final String FILTER = "." + FILE_TYPE;
 
 	private FileUtils() {
 
@@ -32,6 +33,15 @@ public final class FileUtils {
 		if (StringUtils.isEmpty(path) || StringUtils.isEmpty(fileName)) {
 			throw new EmptyFullPathException();
 		}
-		return path + "/" + fileName + "." + FILE_TYPE;
+		return path + "/" + fileName;
+	}
+
+	public static boolean isFileTypeGood(String file) {
+		if (!StringUtils.isEmpty(file)) {
+			if (file.endsWith(FILTER)) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

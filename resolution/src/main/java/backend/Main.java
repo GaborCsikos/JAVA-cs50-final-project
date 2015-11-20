@@ -19,6 +19,7 @@ public class Main {
 		try {
 			view.start();
 			controller.start();
+			controller.setView(view);
 		} catch (Exception e) {
 			e.printStackTrace();
 			view.showMessage("Problem occured, please contact the developer!");
