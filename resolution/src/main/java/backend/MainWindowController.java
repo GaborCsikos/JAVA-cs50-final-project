@@ -1,9 +1,12 @@
 package backend;
 
 import java.io.File;
+import java.util.List;
 
 import backend.api.FileUtils;
 import backend.api.NothingToSaveException;
+import backend.entity.Resolution;
+import backend.entity.SubTask;
 import backend.entity.Year;
 import frontend.MainWindowView;
 
@@ -73,10 +76,17 @@ public class MainWindowController {
 		Year loadedYear = model.loadYear(file);
 		if (loadedYear != null) {
 			model.setYearObject(loadedYear);
-			// TODO set year
 		} else {
 			view.showMessage("Couldn't load year");
 		}
 
+	}
+
+	public List<Resolution> getResolutions() {
+		return model.getResolutions();
+	}
+
+	public List<SubTask> loadSubTasks(int index) {
+		return model.getSubtasks(index);
 	}
 }

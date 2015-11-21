@@ -4,8 +4,12 @@
 package backend;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import backend.api.NothingToSaveException;
+import backend.entity.Resolution;
+import backend.entity.SubTask;
 import backend.entity.Year;
 
 /**
@@ -57,6 +61,24 @@ public class MainWindowModel {
 
 	public void setYearObject(Year loadedYear) {
 		this.year = loadedYear;
+		year.setYear(loadedYear.getYear());
+	}
 
+	public List<Resolution> getResolutions() {
+		if (year != null) {
+			return year.getResolutions();
+		} else {
+			return new ArrayList<Resolution>();
+		}
+	}
+
+	public List<SubTask> getSubtasks(int index) {
+		if (year != null) {
+			Resolution res = year.getResolutions().get(index);
+			if (res != null) {
+				return res.getSubtasks();
+			}
+		}
+		return new ArrayList<SubTask>();
 	}
 }
