@@ -11,9 +11,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import backend.api.EmptyFullPathException;
 import backend.api.FileReturnType;
-import backend.api.FileUtils;
 import backend.api.Load;
 import backend.api.Save;
 import backend.entity.Year;
@@ -53,10 +51,9 @@ public class YearService implements Save, Load {
 	 * @see backend.api.Save#save(backend.entity.Year)
 	 */
 	@Override
-	public FileReturnType save(String filePath, String fileName, Year year) {
+	public FileReturnType save(String filePath, Year year) {
 		try {
-			FileOutputStream fileOut = new FileOutputStream(
-					FileUtils.getFullPath(filePath, fileName));
+			FileOutputStream fileOut = new FileOutputStream(filePath);
 			ObjectOutputStream out = new ObjectOutputStream(fileOut);
 			out.writeObject(year);
 			out.close();
@@ -64,11 +61,6 @@ public class YearService implements Save, Load {
 			return FileReturnType.SUCCESS;
 		} catch (IOException i) {
 			i.printStackTrace();
-			return FileReturnType.FAILED;
-		} catch (EmptyFullPathException empty) {
-			System.out.println("filePath:" + filePath);
-			System.out.println("fileName:" + fileName);
-			empty.printStackTrace();
 			return FileReturnType.FAILED;
 		} catch (Exception e) {
 			e.printStackTrace();

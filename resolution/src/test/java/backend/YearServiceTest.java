@@ -11,23 +11,22 @@ import org.junit.Before;
 import org.junit.Test;
 
 import backend.api.FileReturnType;
-import backend.api.FileUtils;
 import backend.entity.Year;
 
 /**
- * Unit test of {@link YearService}
+ * Module test of {@link YearService}
  * 
  * @author Gabor Csikos
  * 
  */
 public class YearServiceTest {
 
-	private static final String filePath = "/home/csikirustu/test";
-	private static final String fileName = "TestYear";
+	private static final String filePath = "/home/csikirustu/test/TestYear.year"; // needs
+																					// to
+																					// be
 	private static final int TEST_YEAR = 2015;
 	private YearService service;
 	private Year year;
-	private String fullPath;
 
 	/**
 	 * @throws java.lang.Exception
@@ -36,19 +35,18 @@ public class YearServiceTest {
 	public void setUp() throws Exception {
 		service = new YearService();
 		year = new Year(TEST_YEAR);
-		fullPath = FileUtils.getFullPath(filePath, fileName);
 	}
 
 	@Test
 	public void testSave() {
-		FileReturnType actual = service.save(filePath, fileName, year);
+		FileReturnType actual = service.save(filePath, year);
 		assertEquals("Saving failed", FileReturnType.SUCCESS, actual);
 	}
 
 	@Test
 	public void testLoad() {
 		testSave(); // depends on save
-		File file = new File(fullPath);
+		File file = new File(filePath);
 		Year loadedYear = service.load(file);
 		assertEquals("Bad year loaded", 2015, loadedYear.getYear());
 	}

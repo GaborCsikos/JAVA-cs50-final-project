@@ -33,8 +33,8 @@ public class MainWindowView extends JFrame implements ActionListener {
 	private JMenuItem saveYear;
 	private JMenuItem exitWithoutSave;
 	private MainWindowController controller;
-	private static final String TEST_PATH = "/home/csikirustu/test"; // TODO
-																		// delete
+	private FileFilter filter = new YearFilter();
+	private JFileChooser chooser;
 	/**
 	 * 
 	 */
@@ -50,30 +50,34 @@ public class MainWindowView extends JFrame implements ActionListener {
 			System.exit(0);
 		} else if (e.getSource() == saveYear) {
 			if (controller.isYearSet()) {
-				JFileChooser chooser = new JFileChooser();
-				chooser.setCurrentDirectory(new java.io.File("."));
-				chooser.setDialogTitle("Save Year to:");
+
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
-				FileFilter filter = new YearFilter();
 				chooser.setFileFilter(filter);
-				chooser.setCurrentDirectory(new File(TEST_PATH));
-				if (chooser.showSaveDialog(null) == JFileChooser.SAVE_DIALOG) {
+				chooser.setSelectedFile(new File(controller.getName()));
+				chooser.setDialogTitle("Save Year");
+				if (chooser.showSaveDialog(this) == JFileChooser.APPROVE_OPTION) {
 					if (chooser.getSelectedFile() != null) {
 						String path = chooser.getSelectedFile()
 								.getAbsolutePath();
 						if (FileUtils.isFileTypeGood(path)) {
 							controller.saveYear(chooser.getSelectedFile()
-									.getAbsolutePath(), path);
-						} else {
-							controller.saveYear(chooser.getSelectedFile()
-									.getAbsolutePath(), controller.getName());
+									.getAbsolutePath());
 						}
 					}
 				}
 			}
 
 		} else if (e.getSource() == loadYear) {
-			// TODO loadYear
+			chooser.setDialogTitle("Load Year");
+			chooser.setSelectedFile(null);
+			if (chooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+				if (chooser.getSelectedFile() != null) {
+					String path = chooser.getSelectedFile().getAbsolutePath();
+					if (FileUtils.isFileTypeGood(path)) {
+						controller.loadYear(chooser.getSelectedFile());
+					}
+				}
+			}
 		} else if (e.getSource() == newYear) {
 			String result = JOptionPane.showInputDialog(this, "Enter a year:");
 			controller.checkNumber(result);
@@ -83,6 +87,13 @@ public class MainWindowView extends JFrame implements ActionListener {
 	public void start() {
 		initMenu();
 		initListeners();
+		initFileChooser();
+	}
+
+	private void initFileChooser() {
+		chooser = new JFileChooser();
+		chooser.setCurrentDirectory(new java.io.File("."));
+
 	}
 
 	public void showMessage(String message) {

@@ -1,7 +1,10 @@
 package backend;
 
+import java.io.File;
+
 import backend.api.FileUtils;
 import backend.api.NothingToSaveException;
+import backend.entity.Year;
 import frontend.MainWindowView;
 
 /**
@@ -23,9 +26,9 @@ public class MainWindowController {
 
 	}
 
-	public void saveYear(String path, String filename) {
+	public void saveYear(String filePath) {
 		try {
-			model.saveYear(path, filename);
+			model.saveYear(filePath);
 		} catch (NothingToSaveException exeption) {
 			view.showMessage("No file Selected to save");
 		}
@@ -38,16 +41,18 @@ public class MainWindowController {
 	}
 
 	public void checkNumber(String result) {
-		try {
-			int year = Integer.parseInt(result);
-			if (year > 2015) {
-				model.createYear(year);
-			} else {
-				view.showMessage("Please select a year from 2016");
-			}
+		if (!result.isEmpty()) {
+			try {
+				int year = Integer.parseInt(result);
+				if (year > 2015) {
+					model.createYear(year);
+				} else {
+					view.showMessage("Please select a year from 2016");
+				}
 
-		} catch (NumberFormatException e) {
-			view.showMessage("Please select a valid year");
+			} catch (NumberFormatException e) {
+				view.showMessage("Please select a valid year");
+			}
 		}
 	}
 
@@ -62,5 +67,16 @@ public class MainWindowController {
 			return true;
 		}
 		return false;
+	}
+
+	public void loadYear(File file) {
+		Year loadedYear = model.loadYear(file);
+		if (loadedYear != null) {
+			model.setYearObject(loadedYear);
+			// TODO set year
+		} else {
+			view.showMessage("Couldn't load year");
+		}
+
 	}
 }
