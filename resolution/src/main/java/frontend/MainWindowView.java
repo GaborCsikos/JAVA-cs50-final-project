@@ -4,12 +4,15 @@
 package frontend;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.List;
 
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
@@ -20,6 +23,7 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.filechooser.FileFilter;
 
 import backend.MainWindowController;
@@ -44,15 +48,25 @@ public class MainWindowView extends JFrame implements ActionListener {
 	private MainWindowController controller;
 	private FileFilter filter = new YearFilter();
 	private JFileChooser chooser;
-	private JPanel resolutionPanelInfo;
+
 	private JComboBox<Resolution> resolutionCombobox;
 	private JComboBox<SubTask> subTaskCombobox;
 	private JCheckBox showOnlyNotFinishedResolutions;
 	private JCheckBox showOnlyNotFinishedTasks;
+	private JLabel resolutionPercentage;
+	private JLabel subTaskPercentage;
+	private JProgressBar resolutionProgress;
+	private JProgressBar subTaskProgress;
 
 	private JPanel resolutionPanelProgress;
+	private JPanel mainPanel;
 	private JPanel subTaskPanelInfo;
+	private JPanel resolutionPanelInfo;
 	private JPanel subTaskPanelProgress;
+	private JPanel managePanel;
+
+	private JButton manageResolution;
+	private JButton manageSubTask;
 	/**
 	 * 
 	 */
@@ -99,14 +113,18 @@ public class MainWindowView extends JFrame implements ActionListener {
 		} else if (e.getSource() == newYear) {
 			String result = JOptionPane.showInputDialog(this, "Enter a year:");
 			controller.checkNumber(result);
+		} else if (e.getSource() == manageResolution) {
+
+		} else if (e.getSource() == manageSubTask) {
+
 		}
 	}
 
 	public void start() {
 		initMenu();
-		initListeners();
 		initFileChooser();
 		initView();
+		initListeners();
 	}
 
 	public void showMessage(String message) {
@@ -134,19 +152,37 @@ public class MainWindowView extends JFrame implements ActionListener {
 		this.setJMenuBar(menuBar);
 		this.setTitle("Resolution planner");
 		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		this.setSize(800, 600);
+		this.setSize(500, 200);
+		this.setResizable(false);
 		this.setVisible(true);
 
 	}
 
 	private void initView() {
-		BorderLayout layout = new BorderLayout();
-
+		mainPanel = new JPanel();
+		getContentPane().add(mainPanel, BorderLayout.WEST);
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
 		addResolutionView();
 		addSubTaskView();
-		getContentPane().setLayout(layout);
-		// getContentPane().add(resolutionPanelInfo, BorderLayout.CENTER);
-		// TODO set main Panel
+		addManageButtons();
+		mainPanel.add(resolutionPanelInfo);
+		mainPanel.add(resolutionPanelProgress);
+		mainPanel.add(subTaskPanelInfo);
+		mainPanel.add(subTaskPanelProgress);
+		mainPanel.add(managePanel);
+	}
+
+	private void addManageButtons() {
+		managePanel = new JPanel(new FlowLayout());
+
+		// buttons
+		manageResolution = new JButton("Manage resolution");
+		manageSubTask = new JButton("Manage task");
+
+		managePanel.add(manageResolution);
+		managePanel.add(manageSubTask);
+		managePanel.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+		managePanel.setVisible(true);
 	}
 
 	private void addSubTaskView() {
@@ -155,15 +191,8 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 	}
 
-	private void addSubTaskProgress() {
-		// TODO Auto-generated method stub
-
-	}
-
 	private void addSubTaskInfo() {
-		FlowLayout subTaskLayout = new FlowLayout();
-		subTaskPanelInfo = new JPanel();
-		subTaskPanelInfo.setLayout(subTaskLayout);
+		subTaskPanelInfo = new JPanel(new FlowLayout());
 
 		// label
 		JLabel taskLabel = new JLabel("Task:");
@@ -183,7 +212,8 @@ public class MainWindowView extends JFrame implements ActionListener {
 		subTaskPanelInfo.add(subTaskCombobox);
 		subTaskPanelInfo.setVisible(true);
 		subTaskPanelInfo.add(showOnlyNotFinishedTasks);
-
+		subTaskPanelInfo
+				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 	}
 
 	private void initListeners() {
@@ -191,6 +221,13 @@ public class MainWindowView extends JFrame implements ActionListener {
 		newYear.addActionListener(this);
 		saveYear.addActionListener(this);
 		loadYear.addActionListener(this);
+		// TODO not implemented
+		showOnlyNotFinishedResolutions.addActionListener(this);
+		showOnlyNotFinishedTasks.addActionListener(this);
+		resolutionCombobox.addActionListener(this);
+		subTaskCombobox.addActionListener(this);
+		manageSubTask.addActionListener(this);
+		manageResolution.addActionListener(this);
 	}
 
 	private void addResolutionView() {
@@ -220,11 +257,49 @@ public class MainWindowView extends JFrame implements ActionListener {
 		resolutionPanelInfo.add(resolutionCombobox);
 		resolutionPanelInfo.setVisible(true);
 		resolutionPanelInfo.add(showOnlyNotFinishedResolutions);
+		resolutionPanelInfo
+				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 	}
 
 	private void addResolutionProgress() {
-		// TODO Auto-generated method stub
+		resolutionPanelProgress = new JPanel(new FlowLayout());
+
+		// label
+		JLabel resolutionLabel = new JLabel("Progress:");
+
+		// progerssBar
+		resolutionProgress = new JProgressBar(0, 100);
+
+		// percentage
+		resolutionPercentage = new JLabel("0%");
+
+		resolutionPanelProgress.add(resolutionLabel);
+		resolutionPanelProgress.add(resolutionProgress);
+		resolutionPanelProgress.add(resolutionPercentage);
+		resolutionPanelProgress
+				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+
+	}
+
+	private void addSubTaskProgress() {
+		subTaskPanelProgress = new JPanel();
+		subTaskPanelProgress.setLayout(new FlowLayout());
+
+		// label
+		JLabel label = new JLabel("Progress:");
+
+		// progerssBar
+		subTaskProgress = new JProgressBar(0, 100);
+
+		// percentage
+		subTaskPercentage = new JLabel("0%");
+
+		subTaskPanelProgress.add(label);
+		subTaskPanelProgress.add(subTaskProgress);
+		subTaskPanelProgress.add(subTaskPercentage);
+		subTaskPanelProgress
+				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
 	}
 
