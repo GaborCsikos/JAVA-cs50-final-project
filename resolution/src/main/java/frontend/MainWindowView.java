@@ -67,6 +67,8 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 	private JButton manageResolution;
 	private JButton manageSubTask;
+
+	private TaskView manageTask;
 	/**
 	 * 
 	 */
@@ -114,10 +116,19 @@ public class MainWindowView extends JFrame implements ActionListener {
 			String result = JOptionPane.showInputDialog(this, "Enter a year:");
 			controller.checkNumber(result);
 		} else if (e.getSource() == manageResolution) {
-
+			manageTask = new ResolutionView(this);
+			manageTask.loadResolutions(resolutionCombobox.getModel());
+			updateElements();
 		} else if (e.getSource() == manageSubTask) {
-
+			manageTask = new SubtaskView(this);
+			manageTask.loadSubtasks(subTaskCombobox.getModel());
+			updateElements();
 		}
+	}
+
+	private void updateElements() {
+		// TODO UPDATE ELEMENTS
+
 	}
 
 	public void start() {
