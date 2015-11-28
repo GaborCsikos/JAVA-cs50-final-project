@@ -27,4 +27,9 @@ public abstract class Task {
 	public void setDone(boolean done) {
 		this.done = done;
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
 }

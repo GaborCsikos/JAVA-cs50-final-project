@@ -49,6 +49,7 @@ public class MainWindowController {
 				int year = Integer.parseInt(result);
 				if (year > 2015) {
 					model.createYear(year);
+					view.setTitle(result);
 				} else {
 					view.showMessage("Please select a year from 2016");
 				}

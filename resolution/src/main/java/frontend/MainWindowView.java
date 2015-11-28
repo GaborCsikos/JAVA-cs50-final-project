@@ -84,7 +84,6 @@ public class MainWindowView extends JFrame implements ActionListener {
 			System.exit(0);
 		} else if (e.getSource() == saveYear) {
 			if (controller.isYearSet()) {
-
 				chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
 				chooser.setFileFilter(filter);
 				chooser.setSelectedFile(new File(controller.getName()));
@@ -116,19 +115,26 @@ public class MainWindowView extends JFrame implements ActionListener {
 			String result = JOptionPane.showInputDialog(this, "Enter a year:");
 			controller.checkNumber(result);
 		} else if (e.getSource() == manageResolution) {
-			manageTask = new ResolutionView(this);
-			manageTask.loadResolutions(resolutionCombobox.getModel());
-			updateElements();
+			if (controller.isYearSet()) {
+				manageTask = new ResolutionView(this, controller);
+				manageTask.setModelCombobox(resolutionCombobox.getModel());
+				loadResolutions();
+			} else {
+				showMessage("Please create a new year");
+			}
 		} else if (e.getSource() == manageSubTask) {
-			manageTask = new SubtaskView(this);
-			manageTask.loadSubtasks(subTaskCombobox.getModel());
-			updateElements();
+			if (controller.isYearSet()
+					&& resolutionCombobox.getSelectedItem() != null) {
+				manageTask = new SubtaskView(this, controller,
+						resolutionCombobox.getSelectedIndex());
+				manageTask.setModelSubtask(subTaskCombobox.getModel());
+				loadSubTasks();
+			} else {
+				showMessage("Please create a new year");
+			}
+		} else if (e.getSource() == resolutionCombobox) {
+			loadSubTasks();
 		}
-	}
-
-	private void updateElements() {
-		// TODO UPDATE ELEMENTS
-
 	}
 
 	public void start() {
@@ -167,6 +173,29 @@ public class MainWindowView extends JFrame implements ActionListener {
 		this.setResizable(false);
 		this.setVisible(true);
 
+	}
+
+	public void initTestData() {
+		controller.checkNumber("2016");
+		Resolution resolutionOne = new Resolution();
+		resolutionOne.setName("Learn java");
+		SubTask subTaskOne = new SubTask();
+		subTaskOne.setName("read java book");
+		SubTask subTaskTwo = new SubTask();
+		subTaskTwo.setName("program");
+		resolutionOne.getSubtasks().add(subTaskOne);
+		resolutionOne.getSubtasks().add(subTaskTwo);
+
+		Resolution resolutionTwo = new Resolution();
+		resolutionTwo.setName("This is Done");
+		SubTask three = new SubTask();
+		three.setName("nothing");
+		three.setDone(true);
+		resolutionTwo.getSubtasks().add(three);
+		controller.getResolutions().add(resolutionOne);
+		controller.getResolutions().add(resolutionTwo);
+		loadResolutions();
+		loadSubTasks();
 	}
 
 	private void initView() {
@@ -214,11 +243,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 		// combobox
 		subTaskCombobox = new JComboBox<SubTask>();
-		List<SubTask> subTasks = controller.loadSubTasks(resolutionCombobox
-				.getSelectedIndex());
-		for (SubTask element : subTasks) {
-			subTaskCombobox.addItem(element);
-		}
+		loadSubTasks();
 		subTaskPanelInfo.add(taskLabel);
 		subTaskPanelInfo.add(subTaskCombobox);
 		subTaskPanelInfo.setVisible(true);
@@ -227,18 +252,25 @@ public class MainWindowView extends JFrame implements ActionListener {
 				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 	}
 
+	private void loadSubTasks() {
+		List<SubTask> subTasks = controller.loadSubTasks(resolutionCombobox
+				.getSelectedIndex());
+		for (SubTask element : subTasks) {
+			subTaskCombobox.addItem(element);
+		}
+	}
+
 	private void initListeners() {
 		exitWithoutSave.addActionListener(this);
 		newYear.addActionListener(this);
 		saveYear.addActionListener(this);
 		loadYear.addActionListener(this);
+		manageSubTask.addActionListener(this);
+		manageResolution.addActionListener(this);
+		resolutionCombobox.addActionListener(this);
 		// TODO not implemented
 		showOnlyNotFinishedResolutions.addActionListener(this);
 		showOnlyNotFinishedTasks.addActionListener(this);
-		resolutionCombobox.addActionListener(this);
-		subTaskCombobox.addActionListener(this);
-		manageSubTask.addActionListener(this);
-		manageResolution.addActionListener(this);
 	}
 
 	private void addResolutionView() {
@@ -260,10 +292,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 		// combobox
 		resolutionCombobox = new JComboBox<Resolution>();
-		List<Resolution> resolutions = controller.getResolutions();
-		for (Resolution resolution : resolutions) {
-			resolutionCombobox.addItem(resolution);
-		}
+		loadResolutions();
 		resolutionPanelInfo.add(resolutionLabel);
 		resolutionPanelInfo.add(resolutionCombobox);
 		resolutionPanelInfo.setVisible(true);
@@ -271,6 +300,13 @@ public class MainWindowView extends JFrame implements ActionListener {
 		resolutionPanelInfo
 				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 
+	}
+
+	private void loadResolutions() {
+		List<Resolution> resolutions = controller.getResolutions();
+		for (Resolution resolution : resolutions) {
+			resolutionCombobox.addItem(resolution);
+		}
 	}
 
 	private void addResolutionProgress() {

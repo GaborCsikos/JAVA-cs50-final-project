@@ -18,6 +18,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import backend.MainWindowController;
 import backend.entity.Resolution;
 import backend.entity.SubTask;
 import backend.entity.Task;
@@ -26,7 +27,7 @@ import backend.entity.Task;
  * @author Gabor Csikos
  * 
  */
-public abstract class TaskView extends JDialog {
+public abstract class TaskView extends JDialog implements ActionListener {
 
 	/**
 	 * 
@@ -44,10 +45,11 @@ public abstract class TaskView extends JDialog {
 
 	protected JPanel operationPanel;
 	protected JLabel taskName;
-	// TODO change combobox
-	private JComboBox<Task> tasks;
+	protected JComboBox<Task> tasks;
 
-	public TaskView(final JFrame frame) {
+	protected MainWindowController controller;
+
+	public TaskView(final JFrame frame, MainWindowController controller) {
 		super(frame);
 		this.dialogInit();
 		this.setSize(500, 200);
@@ -55,13 +57,25 @@ public abstract class TaskView extends JDialog {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		initLayout();
 		setLabel();
+		setActionListeners();
 		this.setModal(true);
-		this.setVisible(true);
+		this.controller = controller;
+	}
+
+	private void setActionListeners() {
+		createButton.addActionListener(this);
+		backButton.addActionListener(this);
+		updateButton.addActionListener(this);
+		deleteButton.addActionListener(this);
 	}
 
 	abstract void setLabel();
 
-	abstract void setAlltask();
+	abstract void createTask();
+
+	abstract void deleteTask(Object selectedItem);
+
+	abstract void updateTask(Object selectedItem);
 
 	private void initLayout() {
 		panel = new JPanel();
@@ -84,7 +98,7 @@ public abstract class TaskView extends JDialog {
 	private void addTaskToview() {
 		taskName = new JLabel("");
 		tasks = new JComboBox<Task>();
-		done = new JCheckBox();
+		done = new JCheckBox("done");
 		taskPanel.add(taskName);
 		taskPanel.add(tasks);
 		taskPanel.add(done);
@@ -113,25 +127,37 @@ public abstract class TaskView extends JDialog {
 	private void addCancelButton() {
 		backButton = new JButton("Back");
 		backButtonPanel.add(backButton);
-		backButton.addActionListener(new ActionListener() {
-
-			@Override
-			public void actionPerformed(final ActionEvent e) {
-				dispose();
-				setAlltask();
-			}
-
-		});
 	}
 
-	public void loadResolutions(ComboBoxModel<Resolution> model) {
-		// TODO Auto-generated method stub
-
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if (e.getSource() == backButton) {
+			dispose();
+		} else if (e.getSource() == createButton) {
+			createTask();
+		} else if (e.getSource() == deleteButton) {
+			deleteTask(tasks.getSelectedItem());
+		} else if (e.getSource() == updateButton) {
+			updateTask(tasks.getSelectedItem());
+		}
 	}
 
-	public void loadSubtasks(ComboBoxModel<SubTask> model) {
-		// TODO Auto-generated method stub
+	public void setModelCombobox(ComboBoxModel<Resolution> model) {
+		int size = model.getSize();
+		for (int i = 0; i < size; i++) {
+			Task element = (Task) model.getElementAt(i);
+			tasks.addItem(element);
+		}
+		this.setVisible(true);
+	}
 
+	public void setModelSubtask(ComboBoxModel<SubTask> model) {
+		int size = model.getSize();
+		for (int i = 0; i < size; i++) {
+			Task element = (Task) model.getElementAt(i);
+			tasks.addItem(element);
+		}
+		this.setVisible(true);
 	}
 
 }
