@@ -81,11 +81,13 @@ public class SubtaskView extends TaskView {
 		controller.getResolutions().get(resolutionIndex).getSubtasks()
 				.get(index).setDone(isDone);
 		if (isDone) {
-			currentPercentage.setText("100");
+			currentPercentage.setValue(100);
 			controller.getResolutions().get(resolutionIndex).getSubtasks()
 					.get(index).setPercentage(100);
-		} else if (!isDone && currentPercentage.getText().equals("100")) {
-			currentPercentage.setText("0");
+			percentagelabel.setText(100 + "%");
+		} else if (!isDone && currentPercentage.getValue() == 100) {
+			currentPercentage.setValue(0);
+			percentagelabel.setText(0 + "%");
 			controller.getResolutions().get(resolutionIndex).getSubtasks()
 					.get(index).setPercentage(0);
 		}
@@ -95,5 +97,16 @@ public class SubtaskView extends TaskView {
 	void setPercentage(int selectedItemIndex, int percentage) {
 		controller.getResolutions().get(resolutionIndex).getSubtasks()
 				.get(selectedItemIndex).setPercentage(percentage);
+		percentagelabel.setText(percentage + "%");
+		currentPercentage.setValue(percentage);
+	}
+
+	@Override
+	void loadState(int selectedIndex) {
+		SubTask subTask = controller.getResolutions().get(resolutionIndex)
+				.getSubtasks().get(selectedIndex);
+		currentPercentage.setValue(subTask.getPercentage());
+		done.setSelected(subTask.isDone());
+		percentagelabel.setText(subTask.getPercentage() + "%");
 	}
 }

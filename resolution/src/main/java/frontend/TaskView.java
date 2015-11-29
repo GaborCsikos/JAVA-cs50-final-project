@@ -16,11 +16,10 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
-
-import org.apache.commons.lang3.StringUtils;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import backend.MainWindowController;
 import backend.entity.Resolution;
@@ -31,7 +30,8 @@ import backend.entity.Task;
  * @author Gabor Csikos
  * 
  */
-public abstract class TaskView extends JDialog implements ActionListener {
+public abstract class TaskView extends JDialog implements ActionListener,
+		ChangeListener {
 
 	/**
 	 * 
@@ -42,12 +42,12 @@ public abstract class TaskView extends JDialog implements ActionListener {
 	private JPanel taskPanel;
 	private JPanel backButtonPanel;
 	private JButton backButton;
-	private JCheckBox done;
+	protected JCheckBox done;
 	private JButton createButton;
 	private JButton updateButton;
 	private JButton deleteButton;
-	private JLabel percentagelabel;
-	protected JTextField currentPercentage;
+	protected JLabel percentagelabel;
+	protected JSlider currentPercentage;
 
 	protected JPanel operationPanel;
 	protected JLabel taskName;
@@ -75,7 +75,7 @@ public abstract class TaskView extends JDialog implements ActionListener {
 		deleteButton.addActionListener(this);
 		done.addActionListener(this);
 		tasks.addActionListener(this);
-		currentPercentage.addActionListener(this);
+		currentPercentage.addChangeListener(this);
 	}
 
 	abstract void setLabel();
@@ -89,6 +89,8 @@ public abstract class TaskView extends JDialog implements ActionListener {
 	abstract void setState(int selectedItemIndex, boolean selected);
 
 	abstract void setPercentage(int selectedItemIndex, int percentage);
+
+	abstract void loadState(int selectedIndex);
 
 	private void initLayout() {
 		panel = new JPanel();
@@ -112,8 +114,8 @@ public abstract class TaskView extends JDialog implements ActionListener {
 		taskName = new JLabel("");
 		tasks = new JComboBox<Task>();
 		done = new JCheckBox("done");
-		percentagelabel = new JLabel("%");
-		currentPercentage = new JTextField("0");
+		percentagelabel = new JLabel("0%");
+		currentPercentage = new JSlider(0, 100);
 		taskPanel.add(taskName);
 		taskPanel.add(tasks);
 		taskPanel.add(currentPercentage);
@@ -162,27 +164,20 @@ public abstract class TaskView extends JDialog implements ActionListener {
 			if (tasks.getSelectedItem() != null) {
 				setState(tasks.getSelectedIndex(), done.isSelected());
 			}
-		} else if (e.getSource() == currentPercentage) {
+		} else if (e.getSource() == tasks) {
+			loadState(tasks.getSelectedIndex());
+		}
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if (e.getSource() == currentPercentage) {
 			if (tasks.getSelectedItem() != null) {
-				String text = currentPercentage.getText();
-				if (StringUtils.isEmpty(text)) {
-					try {
-						int percentage = Integer.parseInt(text);
-						if (percentage < 0 || percentage > 100) {
-							JOptionPane.showMessageDialog(null,
-									"The range is between 0-100", "Error",
-									JOptionPane.ERROR_MESSAGE);
-						} else {
-							setPercentage(tasks.getSelectedIndex(), percentage);
-						}
-					} catch (NumberFormatException exp) {
-						JOptionPane.showMessageDialog(null,
-								"The range is between 0-100", "Error",
-								JOptionPane.ERROR_MESSAGE);
-					}
-				}
+				setPercentage(tasks.getSelectedIndex(),
+						currentPercentage.getValue());
 			}
 		}
+
 	}
 
 	private void setCheckBox(Object selectedItem) {
@@ -202,11 +197,11 @@ public abstract class TaskView extends JDialog implements ActionListener {
 		setCurrentState();
 	}
 
-	private void setCurrentState() {
+	public void setCurrentState() {
 		if (tasks.getSelectedItem() != null) {
 			done.setSelected(((Task) tasks.getSelectedItem()).isDone());
 			int percentage = ((Task) tasks.getSelectedItem()).getPercentage();
-			currentPercentage.setText(String.valueOf(percentage));
+			currentPercentage.setValue(percentage);
 		}
 
 	}
