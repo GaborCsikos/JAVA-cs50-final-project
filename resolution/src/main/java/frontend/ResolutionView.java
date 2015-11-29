@@ -72,4 +72,22 @@ public class ResolutionView extends TaskView {
 		tasks.addItem(resolutionToAdd);
 		controller.getResolutions().add((Resolution) resolutionToAdd);
 	}
+
+	@Override
+	void setState(int index, boolean isDone) {
+		controller.getResolutions().get(index).setDone(isDone);
+		if (isDone) {
+			currentPercentage.setText("100");
+			controller.getResolutions().get(index).setPercentage(100);
+		} else if (!isDone && currentPercentage.getText().equals("100")) {
+			currentPercentage.setText("0");
+			controller.getResolutions().get(index).setPercentage(0);
+		}
+	}
+
+	@Override
+	void setPercentage(int selectedItemIndex, int percentage) {
+		controller.getResolutions().get(selectedItemIndex)
+				.setPercentage(percentage);
+	}
 }

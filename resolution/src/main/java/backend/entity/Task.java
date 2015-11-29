@@ -12,6 +12,8 @@ public abstract class Task {
 	private String name;
 	private boolean done;
 
+	private int percentage;
+
 	public String getName() {
 		return name;
 	}
@@ -31,5 +33,13 @@ public abstract class Task {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	public int getPercentage() {
+		return percentage;
+	}
+
+	public void setPercentage(int percentage) {
+		this.percentage = percentage;
 	}
 }

@@ -118,7 +118,9 @@ public class MainWindowView extends JFrame implements ActionListener {
 			if (controller.isYearSet()) {
 				manageTask = new ResolutionView(this, controller);
 				manageTask.setModelCombobox(resolutionCombobox.getModel());
-				loadResolutions();
+				loadResolutions(showOnlyNotFinishedResolutions.isSelected());
+				controller.reCalculate();
+				setSubTaskPercentage();
 			} else {
 				showMessage("Please create a new year");
 			}
@@ -128,12 +130,22 @@ public class MainWindowView extends JFrame implements ActionListener {
 				manageTask = new SubtaskView(this, controller,
 						resolutionCombobox.getSelectedIndex());
 				manageTask.setModelSubtask(subTaskCombobox.getModel());
-				loadSubTasks();
+				loadSubTasks(showOnlyNotFinishedTasks.isSelected());
+				controller.reCalculate();
+				setSubTaskPercentage();
 			} else {
 				showMessage("Please create a new year");
 			}
 		} else if (e.getSource() == resolutionCombobox) {
-			loadSubTasks();
+			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
+		} else if (e.getSource() == showOnlyNotFinishedResolutions) {
+			loadResolutions(showOnlyNotFinishedResolutions.isSelected());
+			controller.reCalculate();
+			setSubTaskPercentage();
+		} else if (e.getSource() == showOnlyNotFinishedTasks) {
+			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
+			controller.reCalculate();
+			setSubTaskPercentage();
 		}
 	}
 
@@ -173,29 +185,6 @@ public class MainWindowView extends JFrame implements ActionListener {
 		this.setResizable(false);
 		this.setVisible(true);
 
-	}
-
-	public void initTestData() {
-		controller.checkNumber("2016");
-		Resolution resolutionOne = new Resolution();
-		resolutionOne.setName("Learn java");
-		SubTask subTaskOne = new SubTask();
-		subTaskOne.setName("read java book");
-		SubTask subTaskTwo = new SubTask();
-		subTaskTwo.setName("program");
-		resolutionOne.getSubtasks().add(subTaskOne);
-		resolutionOne.getSubtasks().add(subTaskTwo);
-
-		Resolution resolutionTwo = new Resolution();
-		resolutionTwo.setName("This is Done");
-		SubTask three = new SubTask();
-		three.setName("nothing");
-		three.setDone(true);
-		resolutionTwo.getSubtasks().add(three);
-		controller.getResolutions().add(resolutionOne);
-		controller.getResolutions().add(resolutionTwo);
-		loadResolutions();
-		loadSubTasks();
 	}
 
 	private void initView() {
@@ -243,7 +232,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 		// combobox
 		subTaskCombobox = new JComboBox<SubTask>();
-		loadSubTasks();
+		loadSubTasks(showOnlyNotFinishedTasks.isSelected());
 		subTaskPanelInfo.add(taskLabel);
 		subTaskPanelInfo.add(subTaskCombobox);
 		subTaskPanelInfo.setVisible(true);
@@ -252,11 +241,20 @@ public class MainWindowView extends JFrame implements ActionListener {
 				.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
 	}
 
-	private void loadSubTasks() {
-		List<SubTask> subTasks = controller.loadSubTasks(resolutionCombobox
-				.getSelectedIndex());
-		for (SubTask element : subTasks) {
-			subTaskCombobox.addItem(element);
+	private void loadSubTasks(boolean showJustInProgress) {
+		if (resolutionCombobox.getSelectedItem() != null) {
+			subTaskCombobox.removeAllItems();
+			List<SubTask> subTasks = controller.loadSubTasks(resolutionCombobox
+					.getSelectedIndex());
+			for (SubTask element : subTasks) {
+				if (!element.isDone()) {
+					subTaskCombobox.addItem(element);
+				} else {
+					if (!showJustInProgress) {
+						subTaskCombobox.addItem(element);
+					}
+				}
+			}
 		}
 	}
 
@@ -268,7 +266,6 @@ public class MainWindowView extends JFrame implements ActionListener {
 		manageSubTask.addActionListener(this);
 		manageResolution.addActionListener(this);
 		resolutionCombobox.addActionListener(this);
-		// TODO not implemented
 		showOnlyNotFinishedResolutions.addActionListener(this);
 		showOnlyNotFinishedTasks.addActionListener(this);
 	}
@@ -292,7 +289,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 		// combobox
 		resolutionCombobox = new JComboBox<Resolution>();
-		loadResolutions();
+		loadResolutions(showOnlyNotFinishedResolutions.isSelected());
 		resolutionPanelInfo.add(resolutionLabel);
 		resolutionPanelInfo.add(resolutionCombobox);
 		resolutionPanelInfo.setVisible(true);
@@ -302,10 +299,17 @@ public class MainWindowView extends JFrame implements ActionListener {
 
 	}
 
-	private void loadResolutions() {
+	private void loadResolutions(boolean showJustInProgress) {
 		List<Resolution> resolutions = controller.getResolutions();
+		resolutionCombobox.removeAllItems();
 		for (Resolution resolution : resolutions) {
-			resolutionCombobox.addItem(resolution);
+			if (!resolution.isDone()) {
+				resolutionCombobox.addItem(resolution);
+			} else {
+				if (!showJustInProgress) {
+					resolutionCombobox.addItem(resolution);
+				}
+			}
 		}
 	}
 
@@ -354,5 +358,43 @@ public class MainWindowView extends JFrame implements ActionListener {
 		chooser = new JFileChooser();
 		chooser.setCurrentDirectory(new java.io.File("."));
 
+	}
+
+	public void initTestData() {
+		controller.checkNumber("2016");
+		Resolution resolutionOne = new Resolution();
+		resolutionOne.setName("Learn java");
+		SubTask subTaskOne = new SubTask();
+		subTaskOne.setName("read java book");
+		SubTask subTaskTwo = new SubTask();
+		subTaskTwo.setName("program");
+		resolutionOne.getSubtasks().add(subTaskOne);
+		resolutionOne.getSubtasks().add(subTaskTwo);
+
+		Resolution resolutionTwo = new Resolution();
+		resolutionTwo.setName("This is Done");
+		resolutionTwo.setDone(true);
+		SubTask three = new SubTask();
+		three.setName("nothing");
+		three.setDone(true);
+		resolutionTwo.getSubtasks().add(three);
+		controller.getResolutions().add(resolutionOne);
+		controller.getResolutions().add(resolutionTwo);
+		loadResolutions(true);
+		loadSubTasks(true);
+		controller.reCalculate();
+		setSubTaskPercentage();
+	}
+
+	private void setSubTaskPercentage() {
+		controller.setSubTaskPercentage(subTaskCombobox.getSelectedItem());
+	}
+
+	public void setResolutionPercentage(int i) {
+		resolutionProgress.setValue(i);
+	}
+
+	public void setSubTaskPercentage(int i) {
+		resolutionProgress.setValue(i);
 	}
 }

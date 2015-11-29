@@ -16,7 +16,11 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
+
+import org.apache.commons.lang3.StringUtils;
 
 import backend.MainWindowController;
 import backend.entity.Resolution;
@@ -42,6 +46,8 @@ public abstract class TaskView extends JDialog implements ActionListener {
 	private JButton createButton;
 	private JButton updateButton;
 	private JButton deleteButton;
+	private JLabel percentagelabel;
+	protected JTextField currentPercentage;
 
 	protected JPanel operationPanel;
 	protected JLabel taskName;
@@ -67,6 +73,9 @@ public abstract class TaskView extends JDialog implements ActionListener {
 		backButton.addActionListener(this);
 		updateButton.addActionListener(this);
 		deleteButton.addActionListener(this);
+		done.addActionListener(this);
+		tasks.addActionListener(this);
+		currentPercentage.addActionListener(this);
 	}
 
 	abstract void setLabel();
@@ -76,6 +85,10 @@ public abstract class TaskView extends JDialog implements ActionListener {
 	abstract void deleteTask(Object selectedItem);
 
 	abstract void updateTask(Object selectedItem);
+
+	abstract void setState(int selectedItemIndex, boolean selected);
+
+	abstract void setPercentage(int selectedItemIndex, int percentage);
 
 	private void initLayout() {
 		panel = new JPanel();
@@ -99,8 +112,12 @@ public abstract class TaskView extends JDialog implements ActionListener {
 		taskName = new JLabel("");
 		tasks = new JComboBox<Task>();
 		done = new JCheckBox("done");
+		percentagelabel = new JLabel("%");
+		currentPercentage = new JTextField("0");
 		taskPanel.add(taskName);
 		taskPanel.add(tasks);
+		taskPanel.add(currentPercentage);
+		taskPanel.add(percentagelabel);
 		taskPanel.add(done);
 	}
 
@@ -139,7 +156,40 @@ public abstract class TaskView extends JDialog implements ActionListener {
 			deleteTask(tasks.getSelectedItem());
 		} else if (e.getSource() == updateButton) {
 			updateTask(tasks.getSelectedItem());
+		} else if (e.getSource() == tasks) {
+			setCheckBox(tasks.getSelectedItem());
+		} else if (e.getSource() == done) {
+			if (tasks.getSelectedItem() != null) {
+				setState(tasks.getSelectedIndex(), done.isSelected());
+			}
+		} else if (e.getSource() == currentPercentage) {
+			if (tasks.getSelectedItem() != null) {
+				String text = currentPercentage.getText();
+				if (StringUtils.isEmpty(text)) {
+					try {
+						int percentage = Integer.parseInt(text);
+						if (percentage < 0 || percentage > 100) {
+							JOptionPane.showMessageDialog(null,
+									"The range is between 0-100", "Error",
+									JOptionPane.ERROR_MESSAGE);
+						} else {
+							setPercentage(tasks.getSelectedIndex(), percentage);
+						}
+					} catch (NumberFormatException exp) {
+						JOptionPane.showMessageDialog(null,
+								"The range is between 0-100", "Error",
+								JOptionPane.ERROR_MESSAGE);
+					}
+				}
+			}
 		}
+	}
+
+	private void setCheckBox(Object selectedItem) {
+		if (tasks.getSelectedItem() != null) {
+			done.setSelected(((Task) selectedItem).isDone());
+		}
+
 	}
 
 	public void setModelCombobox(ComboBoxModel<Resolution> model) {
@@ -149,6 +199,16 @@ public abstract class TaskView extends JDialog implements ActionListener {
 			tasks.addItem(element);
 		}
 		this.setVisible(true);
+		setCurrentState();
+	}
+
+	private void setCurrentState() {
+		if (tasks.getSelectedItem() != null) {
+			done.setSelected(((Task) tasks.getSelectedItem()).isDone());
+			int percentage = ((Task) tasks.getSelectedItem()).getPercentage();
+			currentPercentage.setText(String.valueOf(percentage));
+		}
+
 	}
 
 	public void setModelSubtask(ComboBoxModel<SubTask> model) {
@@ -158,6 +218,7 @@ public abstract class TaskView extends JDialog implements ActionListener {
 			tasks.addItem(element);
 		}
 		this.setVisible(true);
+		setCurrentState();
 	}
 
 }

@@ -90,4 +90,48 @@ public class MainWindowController {
 	public List<SubTask> loadSubTasks(int index) {
 		return model.getSubtasks(index);
 	}
+
+	public void reCalculate() {
+		if (model != null) {
+			for (Resolution res : model.getResolutions()) {
+				if (isAllSubtaskFinished(res)) {
+					view.setResolutionPercentage(100);
+				} else {
+					int allSubTask = res.getSubtasks().size();
+					if (allSubTask != 0) {
+						int finished = getFinishedSubTasks(res);
+						view.setResolutionPercentage(finished / allSubTask
+								* 100);
+					}
+				}
+			}
+		}
+
+	}
+
+	private boolean isAllSubtaskFinished(Resolution res) {
+		boolean isAllFinished = true;
+		for (SubTask subTask : res.getSubtasks()) {
+			if (!subTask.isDone()) {
+				return false;
+			}
+		}
+		return isAllFinished;
+	}
+
+	private int getFinishedSubTasks(Resolution res) {
+		int counter = 0;
+		for (SubTask subTask : res.getSubtasks()) {
+			if (subTask.isDone()) {
+				counter++;
+			}
+		}
+		return counter;
+	}
+
+	public void setSubTaskPercentage(Object selectedItem) {
+		if (model != null && selectedItem instanceof SubTask) {
+			view.setSubTaskPercentage(((SubTask) selectedItem).getPercentage());
+		}
+	}
 }
