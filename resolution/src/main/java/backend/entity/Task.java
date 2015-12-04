@@ -12,6 +12,14 @@ public abstract class Task {
 	private String name;
 	private boolean done;
 
+	private long id;
+	private static long idCounter = 0;
+
+	public Task() {
+		idCounter++;
+		setId(idCounter);
+	}
+
 	private int percentage;
 
 	public String getName() {
@@ -41,5 +49,13 @@ public abstract class Task {
 
 	public void setPercentage(int percentage) {
 		this.percentage = percentage;
+	}
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
 	}
 }

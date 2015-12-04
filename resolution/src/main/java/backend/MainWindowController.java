@@ -134,4 +134,35 @@ public class MainWindowController {
 			view.setSubTaskPercentage(((SubTask) selectedItem).getPercentage());
 		}
 	}
+
+	public Resolution getResolutionById(long id) {
+		for (Resolution res : model.getResolutions()) {
+			if (id == res.getId()) {
+				return res;
+			}
+		}
+		return null;
+	}
+
+	public SubTask getSubtaskById(long resolutionId, long subTaskId) {
+		for (Resolution res : model.getResolutions()) {
+			if (resolutionId == res.getId()) {
+				for (SubTask subTask : res.getSubtasks()) {
+					if (subTaskId == subTask.getId()) {
+						return subTask;
+					}
+				}
+			}
+		}
+		return null;
+	}
+
+	public List<SubTask> getSubTasksByResolutionId(long id) {
+		for (Resolution res : model.getResolutions()) {
+			if (id == res.getId()) {
+				return res.getSubtasks();
+			}
+		}
+		return null;
+	}
 }

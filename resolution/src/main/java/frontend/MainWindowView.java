@@ -116,23 +116,20 @@ public class MainWindowView extends JFrame implements ActionListener {
 			controller.checkNumber(result);
 		} else if (e.getSource() == manageResolution) {
 			if (controller.isYearSet()) {
-				manageTask = new ResolutionView(this, controller);
+				manageTask = new ResolutionView(this, controller, true);
 				manageTask.setModelCombobox(resolutionCombobox.getModel());
 				loadResolutions(showOnlyNotFinishedResolutions.isSelected());
-				controller.reCalculate();
-				setSubTaskPercentage();
 			} else {
 				showMessage("Please create a new year");
 			}
 		} else if (e.getSource() == manageSubTask) {
 			if (controller.isYearSet()
 					&& resolutionCombobox.getSelectedItem() != null) {
-				manageTask = new SubtaskView(this, controller,
-						resolutionCombobox.getSelectedIndex());
+				long id = ((Resolution) resolutionCombobox.getSelectedItem())
+						.getId();
+				manageTask = new SubtaskView(this, controller, id);
 				manageTask.setModelSubtask(subTaskCombobox.getModel());
 				loadSubTasks(showOnlyNotFinishedTasks.isSelected());
-				controller.reCalculate();
-				setSubTaskPercentage();
 			} else {
 				showMessage("Please create a new year");
 			}
@@ -140,13 +137,13 @@ public class MainWindowView extends JFrame implements ActionListener {
 			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
 		} else if (e.getSource() == showOnlyNotFinishedResolutions) {
 			loadResolutions(showOnlyNotFinishedResolutions.isSelected());
-			controller.reCalculate();
-			setSubTaskPercentage();
 		} else if (e.getSource() == showOnlyNotFinishedTasks) {
 			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
-			controller.reCalculate();
-			setSubTaskPercentage();
 		}
+		loadSubTasks(showOnlyNotFinishedTasks.isSelected());
+		loadResolutions(showOnlyNotFinishedResolutions.isSelected());
+		controller.reCalculate();
+		setSubTaskPercentage();
 	}
 
 	public void start() {

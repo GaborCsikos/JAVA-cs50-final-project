@@ -23,8 +23,9 @@ public class ResolutionView extends TaskView {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public ResolutionView(JFrame frame, MainWindowController controller) {
-		super(frame, controller);
+	public ResolutionView(JFrame frame, MainWindowController controller,
+			boolean isResolution) {
+		super(frame, controller, isResolution, 0);
 	}
 
 	@Override
@@ -38,69 +39,37 @@ public class ResolutionView extends TaskView {
 		if (!StringUtils.isEmpty(resolution)) {
 			Task resolutionToAdd = new Resolution();
 			resolutionToAdd.setName(resolution);
-			tasks.addItem(resolutionToAdd);
 			controller.getResolutions().add((Resolution) resolutionToAdd);
 		}
 
 	}
 
 	@Override
-	void deleteTask(Object selectedItem) {
-		if (selectedItem != null && selectedItem instanceof Resolution) {
-			tasks.removeItem((Task) selectedItem);
-			controller.getResolutions().remove((Resolution) selectedItem);
-		}
+	void deleteTask(long selectedItemId) {
+		controller.getResolutions().remove(selectedItemId);
 
 	}
 
 	@Override
-	void updateTask(Object selectedItem) {
-		if (selectedItem != null && selectedItem instanceof Resolution) {
-			String name = ((Resolution) selectedItem).getName();
-			String resolution = JOptionPane.showInputDialog("Edit Resolution:"
-					+ name);
-			if (!StringUtils.isEmpty(resolution)) {
-				deleteTask(selectedItem);
-				createTask(resolution);
-			}
-		}
-	}
-
-	private void createTask(String resolutionName) {
-		Task resolutionToAdd = new Resolution();
-		resolutionToAdd.setName(resolutionName);
-		tasks.addItem(resolutionToAdd);
-		controller.getResolutions().add((Resolution) resolutionToAdd);
-	}
-
-	@Override
-	void setState(int index, boolean isDone) {
-		controller.getResolutions().get(index).setDone(isDone);
-		if (isDone) {
-			currentPercentage.setValue(100);
-			controller.getResolutions().get(index).setPercentage(100);
-			percentagelabel.setText(100 + "%");
-		} else if (!isDone && currentPercentage.getValue() == 100) {
-			currentPercentage.setValue(0);
-			controller.getResolutions().get(index).setPercentage(0);
-			percentagelabel.setText(0 + "%");
+	void updateTask(long selectedItemId) {
+		controller.getResolutionById(selectedItemId);
+		String name = controller.getResolutionById(selectedItemId).getName();
+		String resolution = JOptionPane.showInputDialog("Edit Resolution:"
+				+ name);
+		if (!StringUtils.isEmpty(resolution)) {
+			controller.getResolutionById(selectedItemId).setName(resolution);
 		}
 	}
 
 	@Override
-	void setPercentage(int selectedItemIndex, int percentage) {
-		controller.getResolutions().get(selectedItemIndex)
-				.setPercentage(percentage);
-		percentagelabel.setText(percentage + "%");
-		currentPercentage.setValue(percentage);
+	void setState(long selectedItemId, boolean isDone) {
+		controller.getResolutionById(selectedItemId).setDone(isDone);
 	}
 
 	@Override
-	void loadState(int selectedIndex) {
-		Resolution resolution = controller.getResolutions().get(selectedIndex);
-		currentPercentage.setValue(resolution.getPercentage());
-		done.setSelected(resolution.isDone());
-		percentagelabel.setText(resolution.getPercentage() + "%");
+	void setPercentage(long selectedItemId, int percentage) {
+		controller.getResolutionById(selectedItemId).setPercentage(
+				percentage);
 	}
 
 }

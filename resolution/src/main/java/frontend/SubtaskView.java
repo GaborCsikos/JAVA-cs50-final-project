@@ -6,7 +6,6 @@ import javax.swing.JOptionPane;
 import org.apache.commons.lang3.StringUtils;
 
 import backend.MainWindowController;
-import backend.entity.Resolution;
 import backend.entity.SubTask;
 import backend.entity.Task;
 
@@ -21,12 +20,12 @@ public class SubtaskView extends TaskView {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private int resolutionIndex;
+	private long resolutionId;
 
 	public SubtaskView(JFrame frame, MainWindowController controller,
-			int resolutionIndex) {
-		super(frame, controller);
-		this.resolutionIndex = resolutionIndex;
+			long resolutionId) {
+		super(frame, controller, false, resolutionId);
+		this.resolutionId = resolutionId;
 	}
 
 	@Override
@@ -40,73 +39,38 @@ public class SubtaskView extends TaskView {
 		if (!StringUtils.isEmpty(subtask)) {
 			Task subtaskToAdd = new SubTask();
 			subtaskToAdd.setName(subtask);
-			tasks.addItem(subtaskToAdd);
-			controller.getResolutions().get(resolutionIndex).getSubtasks()
+			controller.getResolutionById(resolutionId).getSubtasks()
 					.add((SubTask) subtaskToAdd);
 		}
 	}
 
 	@Override
-	void deleteTask(Object selectedItem) {
-		if (selectedItem != null && selectedItem instanceof SubTask) {
-			tasks.removeItem((Task) selectedItem);
-			controller.getResolutions().get(resolutionIndex).getSubtasks()
-					.remove((SubTask) (Task) selectedItem);
-		}
-
+	void deleteTask(long selectedItemId) {
+		controller.getResolutionById(resolutionId).getSubtasks()
+				.remove(selectedItemId);
 	}
 
 	@Override
-	void updateTask(Object selectedItem) {
-		if (selectedItem != null && selectedItem instanceof SubTask) {
-			String name = ((SubTask) selectedItem).getName();
-			String subTask = JOptionPane
-					.showInputDialog("Edit SubTask:" + name);
-			if (!StringUtils.isEmpty(subTask)) {
-				deleteTask(selectedItem);
-				createTask(subTask);
-			}
-		}
-	}
-
-	private void createTask(String resolutionName) {
-		Task resolutionToAdd = new Resolution();
-		resolutionToAdd.setName(resolutionName);
-		tasks.addItem(resolutionToAdd);
-		controller.getResolutions().add((Resolution) resolutionToAdd);
-	}
-
-	@Override
-	void setState(int index, boolean isDone) {
-		controller.getResolutions().get(resolutionIndex).getSubtasks()
-				.get(index).setDone(isDone);
-		if (isDone) {
-			currentPercentage.setValue(100);
-			controller.getResolutions().get(resolutionIndex).getSubtasks()
-					.get(index).setPercentage(100);
-			percentagelabel.setText(100 + "%");
-		} else if (!isDone && currentPercentage.getValue() == 100) {
-			currentPercentage.setValue(0);
-			percentagelabel.setText(0 + "%");
-			controller.getResolutions().get(resolutionIndex).getSubtasks()
-					.get(index).setPercentage(0);
+	void updateTask(long selectedItemId) {
+		String name = controller.getSubtaskById(resolutionId, selectedItemId)
+				.getName();
+		String subTask = JOptionPane.showInputDialog("Edit SubTask:" + name);
+		if (!StringUtils.isEmpty(subTask)) {
+			controller.getSubtaskById(resolutionId, selectedItemId).setName(
+					subTask);
 		}
 	}
 
 	@Override
-	void setPercentage(int selectedItemIndex, int percentage) {
-		controller.getResolutions().get(resolutionIndex).getSubtasks()
-				.get(selectedItemIndex).setPercentage(percentage);
-		percentagelabel.setText(percentage + "%");
-		currentPercentage.setValue(percentage);
+	void setState(long selectedItemIndex, boolean isDone) {
+		controller.getSubtaskById(resolutionId, selectedItemIndex).setDone(
+				isDone);
 	}
 
 	@Override
-	void loadState(int selectedIndex) {
-		SubTask subTask = controller.getResolutions().get(resolutionIndex)
-				.getSubtasks().get(selectedIndex);
-		currentPercentage.setValue(subTask.getPercentage());
-		done.setSelected(subTask.isDone());
-		percentagelabel.setText(subTask.getPercentage() + "%");
+	void setPercentage(long selectedItemIndex, int percentage) {
+		controller.getSubtaskById(resolutionId, selectedItemIndex)
+				.setPercentage(percentage);
 	}
+
 }

@@ -54,8 +54,11 @@ public abstract class TaskView extends JDialog implements ActionListener,
 	protected JComboBox<Task> tasks;
 
 	protected MainWindowController controller;
+	protected boolean isResolution;
+	private long resolutionId;
 
-	public TaskView(final JFrame frame, MainWindowController controller) {
+	public TaskView(final JFrame frame, MainWindowController controller,
+			boolean isResolution, long resolutionId) {
 		super(frame);
 		this.dialogInit();
 		this.setSize(500, 200);
@@ -66,6 +69,8 @@ public abstract class TaskView extends JDialog implements ActionListener,
 		setActionListeners();
 		this.setModal(true);
 		this.controller = controller;
+		this.isResolution = isResolution;
+		this.resolutionId = resolutionId;
 	}
 
 	private void setActionListeners() {
@@ -82,15 +87,23 @@ public abstract class TaskView extends JDialog implements ActionListener,
 
 	abstract void createTask();
 
-	abstract void deleteTask(Object selectedItem);
+	abstract void deleteTask(long selectedItemId);
 
-	abstract void updateTask(Object selectedItem);
+	abstract void updateTask(long selectedItemId);
 
-	abstract void setState(int selectedItemIndex, boolean selected);
+	abstract void setState(long selectedItemId, boolean selected);
 
-	abstract void setPercentage(int selectedItemIndex, int percentage);
+	abstract void setPercentage(long selectedItemId, int percentage);
 
-	abstract void loadState(int selectedIndex);
+	public void loadState(long selectedItemId) {
+		if (tasks.getSelectedItem() != null) {
+			currentPercentage.setValue(((Task) tasks.getSelectedItem())
+					.getPercentage());
+			done.setSelected(((Task) tasks.getSelectedItem()).isDone());
+			int percentage = ((Task) tasks.getSelectedItem()).getPercentage();
+			percentagelabel.setText(percentage + "%");
+		}
+	}
 
 	private void initLayout() {
 		panel = new JPanel();
@@ -155,25 +168,50 @@ public abstract class TaskView extends JDialog implements ActionListener,
 		} else if (e.getSource() == createButton) {
 			createTask();
 		} else if (e.getSource() == deleteButton) {
-			deleteTask(tasks.getSelectedItem());
+			if (tasks.getSelectedItem() != null) {
+				deleteTask(((Task) tasks.getSelectedItem()).getId());
+			}
 		} else if (e.getSource() == updateButton) {
-			updateTask(tasks.getSelectedItem());
+			if (tasks.getSelectedItem() != null) {
+				updateTask(((Task) tasks.getSelectedItem()).getId());
+			}
 		} else if (e.getSource() == tasks) {
 			setCheckBox(tasks.getSelectedItem());
 		} else if (e.getSource() == done) {
 			if (tasks.getSelectedItem() != null) {
-				setState(tasks.getSelectedIndex(), done.isSelected());
+				setState(((Task) tasks.getSelectedItem()).getId(),
+						done.isSelected());
 			}
-		} else if (e.getSource() == tasks) {
-			loadState(tasks.getSelectedIndex());
+
 		}
+		if (tasks.getSelectedItem() != null) {
+			loadState(((Task) tasks.getSelectedItem()).getId());
+		}
+		reloadModel();
+
+	}
+
+	private void reloadModel() {
+		if (isResolution) {
+			for (Resolution element : controller.getResolutions()) {
+				tasks.addItem((Task) element);
+			}
+		} else {
+			for (SubTask element : controller
+					.getSubTasksByResolutionId(resolutionId)) {
+				tasks.addItem((Task) element);
+			}
+		}
+
+		setCurrentState();
+
 	}
 
 	@Override
 	public void stateChanged(ChangeEvent e) {
 		if (e.getSource() == currentPercentage) {
 			if (tasks.getSelectedItem() != null) {
-				setPercentage(tasks.getSelectedIndex(),
+				setPercentage(((Task) tasks.getSelectedItem()).getId(),
 						currentPercentage.getValue());
 			}
 		}
@@ -193,8 +231,8 @@ public abstract class TaskView extends JDialog implements ActionListener,
 			Task element = (Task) model.getElementAt(i);
 			tasks.addItem(element);
 		}
-		this.setVisible(true);
 		setCurrentState();
+		this.setVisible(true);
 	}
 
 	public void setCurrentState() {
@@ -202,6 +240,7 @@ public abstract class TaskView extends JDialog implements ActionListener,
 			done.setSelected(((Task) tasks.getSelectedItem()).isDone());
 			int percentage = ((Task) tasks.getSelectedItem()).getPercentage();
 			currentPercentage.setValue(percentage);
+			percentagelabel.setText(percentage + "%");
 		}
 
 	}
@@ -212,8 +251,8 @@ public abstract class TaskView extends JDialog implements ActionListener,
 			Task element = (Task) model.getElementAt(i);
 			tasks.addItem(element);
 		}
-		this.setVisible(true);
 		setCurrentState();
+		this.setVisible(true);
 	}
 
 }
