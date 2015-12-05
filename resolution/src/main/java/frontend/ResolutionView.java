@@ -46,8 +46,7 @@ public class ResolutionView extends TaskView {
 
 	@Override
 	void deleteTask(long selectedItemId) {
-		controller.getResolutions().remove(selectedItemId);
-
+		controller.removeResolutionById(selectedItemId);
 	}
 
 	@Override
@@ -64,12 +63,21 @@ public class ResolutionView extends TaskView {
 	@Override
 	void setState(long selectedItemId, boolean isDone) {
 		controller.getResolutionById(selectedItemId).setDone(isDone);
+		if (isDone) {
+			controller.getResolutionById(selectedItemId).setPercentage(100);
+		} else {
+			controller.getResolutionById(selectedItemId).setPercentage(0);
+		}
 	}
 
 	@Override
 	void setPercentage(long selectedItemId, int percentage) {
-		controller.getResolutionById(selectedItemId).setPercentage(
-				percentage);
+		controller.getResolutionById(selectedItemId).setPercentage(percentage);
+		if (percentage == 100) {
+			controller.getResolutionById(selectedItemId).setDone(true);
+		} else if (percentage < 100) {
+			controller.getResolutionById(selectedItemId).setDone(false);
+		}
 	}
 
 }

@@ -165,4 +165,28 @@ public class MainWindowController {
 		}
 		return null;
 	}
+
+	public void removeTaskById(long resolutionId, long selectedItemId) {
+		for (Resolution res : model.getResolutions()) {
+			if (resolutionId == res.getId()) {
+				for (SubTask subTask : res.getSubtasks()) {
+					if (selectedItemId == subTask.getId()) {
+						res.getSubtasks().remove(subTask);
+						break;
+					}
+				}
+			}
+		}
+
+	}
+
+	public void removeResolutionById(long selectedItemId) {
+		for (Resolution res : model.getResolutions()) {
+			if (selectedItemId == res.getId()) {
+				model.getResolutions().remove(res);
+				break;
+			}
+		}
+
+	}
 }

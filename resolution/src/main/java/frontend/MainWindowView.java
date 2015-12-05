@@ -118,7 +118,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 			if (controller.isYearSet()) {
 				manageTask = new ResolutionView(this, controller, true);
 				manageTask.setModelCombobox(resolutionCombobox.getModel());
-				loadResolutions(showOnlyNotFinishedResolutions.isSelected());
+				reLoad();
 			} else {
 				showMessage("Please create a new year");
 			}
@@ -129,7 +129,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 						.getId();
 				manageTask = new SubtaskView(this, controller, id);
 				manageTask.setModelSubtask(subTaskCombobox.getModel());
-				loadSubTasks(showOnlyNotFinishedTasks.isSelected());
+				reLoad();
 			} else {
 				showMessage("Please create a new year");
 			}
@@ -140,6 +140,10 @@ public class MainWindowView extends JFrame implements ActionListener {
 		} else if (e.getSource() == showOnlyNotFinishedTasks) {
 			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
 		}
+
+	}
+
+	private void reLoad() {
 		loadSubTasks(showOnlyNotFinishedTasks.isSelected());
 		loadResolutions(showOnlyNotFinishedResolutions.isSelected());
 		controller.reCalculate();

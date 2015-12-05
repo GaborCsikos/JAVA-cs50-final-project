@@ -167,13 +167,16 @@ public abstract class TaskView extends JDialog implements ActionListener,
 			dispose();
 		} else if (e.getSource() == createButton) {
 			createTask();
+			reloadModel();
 		} else if (e.getSource() == deleteButton) {
 			if (tasks.getSelectedItem() != null) {
 				deleteTask(((Task) tasks.getSelectedItem()).getId());
+				reloadModel();
 			}
 		} else if (e.getSource() == updateButton) {
 			if (tasks.getSelectedItem() != null) {
 				updateTask(((Task) tasks.getSelectedItem()).getId());
+				reloadModel();
 			}
 		} else if (e.getSource() == tasks) {
 			setCheckBox(tasks.getSelectedItem());
@@ -187,11 +190,11 @@ public abstract class TaskView extends JDialog implements ActionListener,
 		if (tasks.getSelectedItem() != null) {
 			loadState(((Task) tasks.getSelectedItem()).getId());
 		}
-		reloadModel();
 
 	}
 
 	private void reloadModel() {
+		tasks.removeAllItems();
 		if (isResolution) {
 			for (Resolution element : controller.getResolutions()) {
 				tasks.addItem((Task) element);
@@ -213,6 +216,14 @@ public abstract class TaskView extends JDialog implements ActionListener,
 			if (tasks.getSelectedItem() != null) {
 				setPercentage(((Task) tasks.getSelectedItem()).getId(),
 						currentPercentage.getValue());
+				int percentage = ((Task) tasks.getSelectedItem())
+						.getPercentage();
+				percentagelabel.setText(percentage + "%");
+				if (percentage == 100) {
+					done.setSelected(true);
+				} else if (percentage < 100) {
+					done.setSelected(false);
+				}
 			}
 		}
 
@@ -221,6 +232,11 @@ public abstract class TaskView extends JDialog implements ActionListener,
 	private void setCheckBox(Object selectedItem) {
 		if (tasks.getSelectedItem() != null) {
 			done.setSelected(((Task) selectedItem).isDone());
+			if (done.isSelected()) {
+				currentPercentage.setValue(100);
+			} else {
+				currentPercentage.setValue(0);
+			}
 		}
 
 	}

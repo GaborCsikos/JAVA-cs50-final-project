@@ -46,8 +46,7 @@ public class SubtaskView extends TaskView {
 
 	@Override
 	void deleteTask(long selectedItemId) {
-		controller.getResolutionById(resolutionId).getSubtasks()
-				.remove(selectedItemId);
+		controller.removeTaskById(resolutionId, selectedItemId);
 	}
 
 	@Override
@@ -65,12 +64,26 @@ public class SubtaskView extends TaskView {
 	void setState(long selectedItemIndex, boolean isDone) {
 		controller.getSubtaskById(resolutionId, selectedItemIndex).setDone(
 				isDone);
+		if (isDone) {
+			controller.getSubtaskById(resolutionId, selectedItemIndex)
+					.setPercentage(100);
+		} else {
+			controller.getSubtaskById(resolutionId, selectedItemIndex)
+					.setPercentage(0);
+		}
 	}
 
 	@Override
 	void setPercentage(long selectedItemIndex, int percentage) {
 		controller.getSubtaskById(resolutionId, selectedItemIndex)
 				.setPercentage(percentage);
+		if (percentage == 100) {
+			controller.getSubtaskById(resolutionId, selectedItemIndex).setDone(
+					true);
+		} else if (percentage < 100) {
+			controller.getSubtaskById(resolutionId, selectedItemIndex).setDone(
+					false);
+		}
 	}
 
 }
