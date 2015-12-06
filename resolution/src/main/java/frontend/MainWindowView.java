@@ -118,6 +118,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 			if (controller.isYearSet()) {
 				manageTask = new ResolutionView(this, controller, true);
 				manageTask.setModelCombobox(resolutionCombobox.getModel());
+				controller.reCalculate();
 				reLoad();
 			} else {
 				showMessage("Please create a new year");
@@ -129,25 +130,24 @@ public class MainWindowView extends JFrame implements ActionListener {
 						.getId();
 				manageTask = new SubtaskView(this, controller, id);
 				manageTask.setModelSubtask(subTaskCombobox.getModel());
+				controller.reCalculate();
 				reLoad();
 			} else {
 				showMessage("Please create a new year");
 			}
-		} else if (e.getSource() == resolutionCombobox) {
-			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
+
 		} else if (e.getSource() == showOnlyNotFinishedResolutions) {
 			loadResolutions(showOnlyNotFinishedResolutions.isSelected());
 		} else if (e.getSource() == showOnlyNotFinishedTasks) {
 			loadSubTasks(showOnlyNotFinishedTasks.isSelected());
 		}
-
+		setResolutionPercentage();
+		setSubTaskPercentage();
 	}
 
 	private void reLoad() {
 		loadSubTasks(showOnlyNotFinishedTasks.isSelected());
 		loadResolutions(showOnlyNotFinishedResolutions.isSelected());
-		controller.reCalculate();
-		setSubTaskPercentage();
 	}
 
 	public void start() {
@@ -267,6 +267,7 @@ public class MainWindowView extends JFrame implements ActionListener {
 		manageSubTask.addActionListener(this);
 		manageResolution.addActionListener(this);
 		resolutionCombobox.addActionListener(this);
+		subTaskCombobox.addActionListener(this);
 		showOnlyNotFinishedResolutions.addActionListener(this);
 		showOnlyNotFinishedTasks.addActionListener(this);
 	}
@@ -388,14 +389,20 @@ public class MainWindowView extends JFrame implements ActionListener {
 	}
 
 	private void setSubTaskPercentage() {
-		controller.setSubTaskPercentage(subTaskCombobox.getSelectedItem());
+		if (subTaskCombobox.getSelectedItem() != null) {
+			int percentage = ((SubTask) subTaskCombobox.getSelectedItem())
+					.getPercentage();
+			subTaskPercentage.setText(percentage + "%");
+			subTaskProgress.setValue(percentage);
+		}
 	}
 
-	public void setResolutionPercentage(int i) {
-		resolutionProgress.setValue(i);
-	}
-
-	public void setSubTaskPercentage(int i) {
-		resolutionProgress.setValue(i);
+	private void setResolutionPercentage() {
+		if (resolutionCombobox.getSelectedItem() != null) {
+			int percentage = ((Resolution) resolutionCombobox.getSelectedItem())
+					.getPercentage();
+			resolutionPercentage.setText(percentage + "%");
+			resolutionProgress.setValue(percentage);
+		}
 	}
 }

@@ -95,13 +95,12 @@ public class MainWindowController {
 		if (model != null) {
 			for (Resolution res : model.getResolutions()) {
 				if (isAllSubtaskFinished(res)) {
-					view.setResolutionPercentage(100);
+					res.setPercentage(100);
 				} else {
 					int allSubTask = res.getSubtasks().size();
 					if (allSubTask != 0) {
-						int finished = getFinishedSubTasks(res);
-						view.setResolutionPercentage(finished / allSubTask
-								* 100);
+						int allpercentage = getSubTaskPercentage(res);
+						res.setPercentage(allpercentage / allSubTask);
 					}
 				}
 			}
@@ -119,20 +118,12 @@ public class MainWindowController {
 		return isAllFinished;
 	}
 
-	private int getFinishedSubTasks(Resolution res) {
-		int counter = 0;
+	private int getSubTaskPercentage(Resolution res) {
+		int percentage = 0;
 		for (SubTask subTask : res.getSubtasks()) {
-			if (subTask.isDone()) {
-				counter++;
-			}
+			percentage += subTask.getPercentage();
 		}
-		return counter;
-	}
-
-	public void setSubTaskPercentage(Object selectedItem) {
-		if (model != null && selectedItem instanceof SubTask) {
-			view.setSubTaskPercentage(((SubTask) selectedItem).getPercentage());
-		}
+		return percentage;
 	}
 
 	public Resolution getResolutionById(long id) {
